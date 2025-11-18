@@ -1,1 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkFlex - Gestión de Trabajo Flexible</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Iconos de Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Variables de Color Burdeos (Basado en el mockup) */
+        :root {
+            --bs-primary: #800020; /* Burdeos Principal */
+            --bs-primary-hover: #5C0016; /* Burdeos Oscuro */
+            --logo-color: #8D1A2C; /* Tono del logo en el mockup */
+            --text-dark: #333;
+        }
 
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bs-light-bg);
+            /* Centrar la App para simular vista móvil en escritorio */
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Contenedor de la App que simula el teléfono */
+        .app-container {
+            width: 100%;
+            max-width: 450px; /* Ancho típico de un smartphone */
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Global Custom Styles --- */
+        .btn-primary {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+        }
+        .btn-primary:hover {
+            background-color: var(--bs-primary-hover);
+            border-color: var(--bs-primary-hover);
+        }
+        .logo-text {
+            color: var(--logo-color);
+            font-weight: 700;
+        }
+        .header-logo {
+            font-size: 1.5rem;
+            color: var(--bs-primary);
+        }
+        
+        /* --- Navbar/Header App --- */
+        .app-header {
+            background-color: white;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .app-header .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* --- Specific Styles for Mockup elements --- */
+        .profile-icon {
+            font-size: 4rem;
+            color: var(--bs-primary);
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        .calendar-day {
+            padding: 8px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .calendar-day.active {
+            background-color: var(--bs-primary);
+            color: white;
+            font-weight: bold;
+        }
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Header Dinámico de la App (se oculta en Login) -->
+        <header class="app-header p-3 d-flex justify-content-between align-items-center d-none" id="appHeader">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-grid-3x3-gap-fill header-logo me-2"></i>
+                <span class="logo-text">WorkFlex</span>
+            </div>
+            <a href="#" class="text-decoration-none" id="profileLink">
+                <i class="bi bi-person-circle fs-4 text-muted"></i>
+                <span class="d-none d-sm-inline ms-1 text-muted">Mi perfil</span>
+            </a>
+        </header>
+
+        <!-- Contenedor principal de las vistas -->
+        <main class="flex-grow-1 p-4" id="appMainContent">
+            <!-- El contenido de la pantalla activa se inserta aquí con JavaScript -->
+        </main>
+
+        <!-- Footer (Solo para navegación de ejemplo, si fuera necesario) -->
+        <!-- <footer class="p-3 bg-light border-top text-center">Footer App</footer> -->
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // --- Variables Globales ---
+        const mainContent = document.getElementById('appMainContent');
+        const appHeader = document.getElementById('appHeader');
+        const profileLink = document.getElementById('profileLink');
+        let isAuthenticated = false;
+        let currentPage = 'login'; // 'login', 'home', 'profile', 'reserve_type', 'reserve_details', 'confirmation'
+
+        // --- Datos de Mockup ---
+        const MOCK_USER = { name: "Daniel Giménez", email: "daniel.gimenez@workflex.com" };
+        const MOCK_RESERVATION = {
+            date: "10/11/2025",
+            room: "Sala de Conferencias",
+            space: "Escritorio Fijo",
+            time: "09:00 - 18:00"
+        };
+        const MOCK_CALENDAR = {
+            month: "November 2025",
+            days: [
+                { day: 'Dom', code: 0 }, { day: 'Lun', code: 1 }, { day: 'Mar', code: 2 }, { day: 'Mié', code: 3 }, 
+                { day: 'Jue', code: 4 }, { day: 'Vie', code: 5 }, { day: 'Sáb', code: 6 }
+            ],
+            dates: [
+                { num: 30, currentMonth: false }, { num: 1, currentMonth: true }, { num: 2, currentMonth: true }, { num: 3, currentMonth: true },
+                { num: 4, currentMonth: true }, { num: 5, currentMonth: true }, { num: 6, currentMonth: true, active: true }, { num: 7, currentMonth: true },
+                { num: 8, currentMonth: true }, { num: 9, currentMonth: true }, { num: 10, currentMonth: true, reserved: true }, { num: 11, currentMonth: true },
+                { num: 12, currentMonth: true }, { num: 13, currentMonth: true }, { num: 14, currentMonth: true }, { num: 15, currentMonth: true },
+                { num: 16, currentMonth: true }, { num: 17, currentMonth: true }, { num: 18, currentMonth: true }, { num: 19, currentMonth: true },
+                { num: 20, currentMonth: true }, { num: 21, currentMonth: true }, { num: 22, currentMonth: true }, { num: 23, currentMonth: true },
+                { num: 24, currentMonth: true }, { num: 25, currentMonth: true }, { num: 26, currentMonth: true }, { num: 27, currentMonth: true },
+                { num: 28, currentMonth: true }, { num: 29, currentMonth: true }, { num: 30, currentMonth: true }, { num: 1, currentMonth: false },
+                { num: 2, currentMonth: false }, { num: 3, currentMonth: false }, { num: 4, currentMonth: false }, { num: 5, currentMonth: false },
+                { num: 6, currentMonth: false }
+            ]
+        };
+
+        // --- Funciones de Renderizado de Pantallas ---
+
+        function renderCalendar(activeDate = 6) {
+            const daysHtml = MOCK_CALENDAR.days.map(d => `<div class="fw-bold text-muted">${d.day}</div>`).join('');
+            const datesHtml = MOCK_CALENDAR.dates.map(date => {
+                let classes = 'calendar-day text-center';
+                if (!date.currentMonth) classes += ' disabled';
+                if (date.num === activeDate && date.currentMonth) classes += ' active';
+                if (date.reserved) classes += ' text-danger';
+                
+                return `<div class="${classes}">${date.num}</div>`;
+            }).join('');
+
+            return `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <i class="bi bi-chevron-left text-muted"></i>
+                    <span class="fw-bold">${MOCK_CALENDAR.month}</span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </div>
+                <div class="calendar-grid text-muted text-center">${daysHtml}</div>
+                <div class="calendar-grid text-dark text-center mt-1">${datesHtml}</div>
+            `;
+        }
+
+        // Pantalla 1: Login
+        function renderLogin() {
+            appHeader.classList.add('d-none');
+            // Estilo específico del mockup: logo en el centro
+            mainContent.classList.remove('p-4');
+            mainContent.innerHTML = `
+                <div class="text-center pt-5">
+                    <img src="http://googleusercontent.com/image_collection/image_retrieval/8306226160660114322_0" onerror="this.onerror=null;this.src='https://placehold.co/100x100/8D1A2C/FFFFFF?text=Logo';" alt="WorkFlex Logo" class="mb-4 rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                    <h1 class="logo-text mb-5">WorkFlex</h1>
+                </div>
+
+                <div class="card p-4 shadow-sm border-0">
+                    <p class="fw-bold mb-3">Iniciar sesión</p>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="inputUser" class="form-label visually-hidden">Usuario</label>
+                            <input type="email" class="form-control" id="inputUser" placeholder="Usuario" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="inputPassword" class="form-label visually-hidden">Contraseña</label>
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Continuar</button>
+                    </form>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="mb-1 text-muted small">¿No dispones de una cuenta en WorkFlex?</p>
+                    <a href="#" class="btn btn-outline-secondary w-100" style="max-width: 200px;">Regístrate</a>
+                </div>
+            `;
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        }
+
+        // Pantalla 2: Home (Sesión iniciada)
+        function renderHome() {
+            appHeader.classList.remove('d-none');
+            mainContent.classList.add('p-4');
+            mainContent.innerHTML = `
+                <h2 class="mb-4">Sesión iniciada</h2>
+                <h1 class="fw-light mb-5">Hola de nuevo, ${MOCK_USER.name.split(' ')[0]}</h1>
+                
+                <div class="d-grid gap-3">
+                    <button class="btn btn-primary btn-lg py-3" onclick="navigate('reserve_type')">Nueva reserva</button>
+                    <button class="btn btn-outline-secondary btn-lg py-3">Modificar/Cancelar reserva</button>
+                </div>
+            `;
+        }
+
+        // Pantalla 3: Perfil
+        function renderProfile() {
+            appHeader.classList.remove('d-none');
+            mainContent.classList.add('p-4');
+            mainContent.innerHTML = `
+                <div class="text-center mb-5">
+                    <i class="bi bi-person-fill profile-icon rounded-circle p-2 border border-3" style="border-color: var(--bs-primary) !important;"></i>
+                    <h2 class="mt-3">${MOCK_USER.name}</h2>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Modificar perfil <i class="bi bi-chevron-right"></i></a>
+                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Estado de la membresía <i class="bi bi-chevron-right"></i></a>
+                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Historial de reservas <i class="bi bi-chevron-right"></i></a>
+                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Facturas <i class="bi bi-chevron-right"></i></a>
+                </div>
+
+                <div class="mt-5">
+                    <button class="btn btn-outline-danger w-100" onclick="handleLogout()">Cerrar sesión</button>
+                </div>
+            `;
+        }
+
+        // Pantalla 4: Nueva Reserva - Tipo y Fecha
+        function renderReserveType() {
+            appHeader.classList.remove('d-none');
+            // Ocultamos el link de Perfil en la cabecera para simular la navegación del mockup
+            profileLink.classList.add('d-none');
+            mainContent.classList.add('p-4');
+            
+            mainContent.innerHTML = `
+                <h2 class="mb-4">Nueva reserva</h2>
+                <p class="fw-bold">Selecciona una sede</p>
+                
+                <div class="mb-4">
+                    <select class="form-select">
+                        <option>Barcelona</option>
+                        <option>Madrid</option>
+                        <option>Valencia</option>
+                    </select>
+                </div>
+
+                <p class="fw-bold">Tipo de espacio</p>
+                <div class="mb-4">
+                    <select class="form-select">
+                        <option>Selecciona tipo de espacio...</option>
+                        <option>Escritorio</option>
+                        <option>Sala de reuniones</option>
+                        <option>Box telefónico</option>
+                    </select>
+                </div>
+
+                <p class="fw-bold">Disponibilidad</p>
+                <div class="card p-3 border-0 shadow-sm mb-4">
+                    ${renderCalendar(6)}
+                </div>
+
+                <button class="btn btn-primary w-100" onclick="navigate('reserve_details')">Confirmar reserva</button>
+                <button class="btn btn-link text-muted w-100 mt-2" onclick="navigate('home')">Cancelar</button>
+            `;
+        }
+
+        // Pantalla 5: Nueva Reserva - Detalles del Espacio
+        function renderReserveDetails() {
+            appHeader.classList.remove('d-none');
+            profileLink.classList.add('d-none');
+            mainContent.classList.add('p-4');
+            
+            mainContent.innerHTML = `
+                <h2 class="mb-4">Nueva reserva</h2>
+                
+                <div class="mb-4">
+                    <p class="fw-bold mb-2">Sede</p>
+                    <select class="form-select">
+                        <option selected>Barcelona</option>
+                    </select>
+                </div>
+
+                <p class="fw-bold mb-2">Tipo de espacio</p>
+                <p class="mb-3">Escritorio</p>
+                
+                <p class="fw-bold mb-2">Escritorio</p>
+                <div class="mb-4">
+                    <select class="form-select">
+                        <option>Selecciona escritorio...</option>
+                        <option>Escritorio Fijo #12</option>
+                        <option>Escritorio Flexible #4A</option>
+                    </select>
+                </div>
+
+                <p class="fw-bold">Disponibilidad</p>
+                <div class="card p-3 border-0 shadow-sm mb-4">
+                    ${renderCalendar(10)}
+                </div>
+
+                <button class="btn btn-primary w-100" onclick="navigate('confirmation')">Confirmar reserva</button>
+                <button class="btn btn-link text-muted w-100 mt-2" onclick="navigate('reserve_type')">Volver</button>
+            `;
+        }
+        
+        // Pantalla 6: Confirmación
+        function renderConfirmation() {
+            appHeader.classList.remove('d-none');
+            profileLink.classList.remove('d-none');
+            mainContent.classList.add('p-4');
+            
+            mainContent.innerHTML = `
+                <div class="text-center pt-5 pb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                    <h1 class="mt-3 mb-5">¡Reserva confirmada!</h1>
+                </div>
+
+                <div class="card p-4 border-0 shadow-sm mb-5">
+                    <p class="fw-bold border-bottom pb-2">Detalles de la reserva:</p>
+                    
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted"><i class="bi bi-calendar-event me-2"></i>Fecha</span>
+                        <span class="fw-bold">${MOCK_RESERVATION.date}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted"><i class="bi bi-door-open me-2"></i>Espacio</span>
+                        <span class="fw-bold">${MOCK_RESERVATION.space}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-2">
+                        <span class="text-muted"><i class="bi bi-clock me-2"></i>Hora</span>
+                        <span class="fw-bold">${MOCK_RESERVATION.time}</span>
+                    </div>
+                </div>
+
+                <p class="text-center text-muted small">Gracias por utilizar WorkFlex.</p>
+                <button class="btn btn-outline-secondary w-100 mt-3" onclick="navigate('home')">Volver al panel principal</button>
+            `;
+        }
+
+        // --- Lógica de Navegación y Auth ---
+
+        // Navegación entre pantallas
+        function navigate(page) {
+            currentPage = page;
+            profileLink.classList.remove('d-none'); // Mostrar por defecto
+            
+            switch (page) {
+                case 'login':
+                    renderLogin();
+                    break;
+                case 'home':
+                    if (isAuthenticated) renderHome();
+                    else renderLogin();
+                    break;
+                case 'profile':
+                    renderProfile();
+                    break;
+                case 'reserve_type':
+                    renderReserveType();
+                    break;
+                case 'reserve_details':
+                    renderReserveDetails();
+                    break;
+                case 'confirmation':
+                    renderConfirmation();
+                    break;
+                default:
+                    renderLogin();
+            }
+            window.scrollTo(0, 0); // Desplazar al inicio al cambiar de vista
+        }
+
+        // Manejadores de Eventos
+        function handleLogin(event) {
+            event.preventDefault();
+            // Simulación de autenticación exitosa
+            isAuthenticated = true;
+            navigate('home');
+        }
+
+        function handleLogout() {
+            isAuthenticated = false;
+            navigate('login');
+        }
+        
+        profileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isAuthenticated) {
+                navigate('profile');
+            }
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            navigate('login');
+        });
+    </script>
+</body>
+</html>

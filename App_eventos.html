@@ -2,436 +2,968 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Esto es CRUCIAL para móviles. Asegura que la web se adapte al ancho del dispositivo -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkFlex - Gestión de Trabajo Flexible</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Iconos de Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Agenda Cultural - Prototipo Accesible</title>
     
+    <!-- Usamos FontAwesome para los iconos (corazón, menú, usuario) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        /* Variables de Color Burdeos (Basado en el mockup) */
+        /* --- 1. VARIABLES Y RESET --- */
+        /* Definimos los colores y fuentes aquí para cambiarlos fácil en el futuro */
         :root {
-            --bs-primary: #800020; /* Burdeos Principal */
-            --bs-primary-hover: #5C0016; /* Burdeos Oscuro */
-            --logo-color: #8D1A2C; /* Tono del logo en el mockup */
-            --text-dark: #333;
+            --color-primario: #800020; /* Burdeos - Color principal */
+            --color-primario-oscuro: #5a0016; /* Para el efecto hover */
+            --color-texto: #333333; /* Gris muy oscuro para lectura cómoda (mejor que negro puro) */
+            --color-fondo: #f9f9f9; /* Blanco roto para no cansar la vista */
+            --blanco: #ffffff;
+            --gris-claro: #e0e0e0;
+            --sombra: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave para dar profundidad */
+        }
+
+        /* Reseteo básico para que se vea igual en todos los navegadores */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            background-color: var(--bs-light-bg);
-            /* Centrar la App para simular vista móvil en escritorio */
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        /* Contenedor de la App que simula el teléfono */
-        .app-container {
-            width: 100%;
-            max-width: 450px; /* Ancho típico de un smartphone */
-            background-color: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* Fuentes sin serifa, más legibles en pantalla */
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.6; /* Altura de línea generosa para facilitar la lectura */
+            font-size: 18px; /* Tamaño base grande para mejor visibilidad (+65 años) */
         }
 
-        /* --- Global Custom Styles --- */
-        .btn-primary {
-            background-color: var(--bs-primary);
-            border-color: var(--bs-primary);
+        /* --- 2. COMPONENTES REUTILIZABLES --- */
+        
+        /* Contenedor principal que limita el ancho en pantallas grandes */
+        .container {
+            width: 100%;
+            max-width: 1200px; /* En PC no pasará de este ancho */
+            margin: 0 auto;
+            padding: 20px;
         }
-        .btn-primary:hover {
-            background-color: var(--bs-primary-hover);
-            border-color: var(--bs-primary-hover);
+
+        /* Botones accesibles: Grandes y con contraste */
+        .btn {
+            display: inline-block;
+            background-color: var(--color-primario);
+            color: var(--blanco);
+            border: none;
+            padding: 15px 30px; /* Relleno generoso */
+            border-radius: 8px; /* Bordes redondeados amigables */
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            width: 100%; /* En móvil ocupan todo el ancho */
+            min-height: 48px; /* REGLA DE ORO: Mínimo 44px-48px para poder tocar con el dedo */
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2); /* Sombreado "sólido" estilo botón físico */
+            transition: transform 0.1s;
+            text-decoration: none;
         }
-        .logo-text {
-            color: var(--logo-color);
-            font-weight: 700;
+
+        .btn:active {
+            transform: translateY(2px); /* Efecto de presionar */
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2);
         }
-        .header-logo {
-            font-size: 1.5rem;
-            color: var(--bs-primary);
+
+        .btn-secundario {
+            background-color: transparent;
+            border: 2px solid var(--color-primario);
+            color: var(--color-primario);
+            box-shadow: none;
+            margin-top: 10px;
         }
         
-        /* --- Navbar/Header App --- */
-        .app-header {
-            background-color: white;
-            border-bottom: 1px solid #eee;
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--color-primario);
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer;
+            box-shadow: none;
+        }
+
+        /* Inputs de formulario grandes y claros */
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid var(--gris-claro);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--blanco);
+        }
+        
+        /* Foco visible para accesibilidad (navegación por teclado) */
+        input:focus, button:focus, a:focus, select:focus {
+            outline: 3px solid #ffcc00; /* Borde amarillo de alto contraste */
+            border-color: var(--color-primario);
+        }
+
+        /* --- 3. ESTRUCTURA DE PANTALLAS (Vistas) --- */
+        /* Por defecto ocultamos todas las vistas y solo mostramos la activa con JS */
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 4. ESTILOS ESPECÍFICOS --- */
+
+        /* Login */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 90vh;
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            color: var(--color-primario);
+            margin-bottom: 2rem;
+        }
+
+        /* Cabecera de la App (Navegación) */
+        header {
+            background: var(--blanco);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--sombra);
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        .app-header .logo-text {
+
+        .header-title {
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: bold;
+            color: var(--color-primario);
+            display: flex; /* Flexbox para alinear */
+            align-items: center; /* Centrado vertical perfecto */
+            justify-content: center; /* Centrado horizontal si es necesario */
+            gap: 8px; /* Espacio consistente entre icono y texto */
+            line-height: 1; /* Evita alturas de línea extrañas */
         }
 
-        /* --- Specific Styles for Mockup elements --- */
-        .profile-icon {
-            font-size: 4rem;
-            color: var(--bs-primary);
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            font-size: 0.9rem;
-        }
-        .calendar-day {
-            padding: 8px 0;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .calendar-day.active {
-            background-color: var(--bs-primary);
-            color: white;
+        /* Estilo para el selector de ciudad */
+        .city-selector {
+            border: none;
+            background-color: transparent;
+            font-size: 1.2rem;
             font-weight: bold;
+            color: var(--color-primario);
+            cursor: pointer;
+            
+            /* Ajustes clave para alineación */
+            padding: 0; 
+            margin: 0;
+            line-height: inherit; /* Hereda la altura de línea del padre */
+            height: auto;
+            vertical-align: middle;
+
+            /* Quitamos la apariencia por defecto fea del navegador */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
-        .calendar-day.disabled {
+        
+        .city-selector:focus {
+            outline: 2px solid #ffcc00;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem; /* Iconos grandes */
+            color: var(--color-texto);
+            cursor: pointer;
+            padding: 10px; /* Área táctil ampliada */
+        }
+
+        /* Tarjetas de Eventos */
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .event-card {
+            background: var(--blanco);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            position: relative; /* Para posicionar el corazón */
+            transition: transform 0.2s;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-3px); /* Pequeño efecto al pasar el ratón */
+        }
+
+        .event-img {
+            width: 100%;
+            height: 200px;
+            background-color: #ddd;
+            object-fit: cover;
+        }
+
+        .event-content {
+            padding: 20px;
+        }
+
+        .event-date {
+            color: var(--color-primario);
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .event-title {
+            font-size: 1.4rem;
+            margin: 10px 0;
+        }
+
+        .event-location {
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .event-tags {
+            margin-top: 10px;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #eee;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #555;
+            margin-right: 5px;
+        }
+
+        /* Botón de favoritos (Corazón) */
+        .fav-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255, 0.9);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            border: none;
             color: #ccc;
-            cursor: default;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fav-btn.active {
+            color: var(--color-primario); /* Se pone burdeos al activar */
+        }
+
+        /* Barra de Búsqueda en Home */
+        .search-bar-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--blanco);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: var(--sombra);
+        }
+        
+        .search-input {
+            flex-grow: 1;
+            border: none;
+            padding: 10px;
+            font-size: 1rem;
+            margin-bottom: 0; /* Override general input style */
+        }
+        
+        .filter-btn-home {
+            background: none;
+            border: none;
+            color: var(--color-texto);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+        
+        .filter-btn-home i {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+            color: var(--color-primario);
+        }
+
+        /* Pantalla de Detalle */
+        .detail-hero {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .detail-content {
+            padding: 20px;
+        }
+
+        /* Pantalla de Confirmación */
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .check-icon {
+            font-size: 5rem;
+            color: green;
+            margin-bottom: 20px;
+        }
+        
+        /* Estilos para Pantalla de Perfil */
+        .profile-header {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 30px 0;
+        }
+        
+        .profile-avatar {
+            font-size: 5rem; 
+            color: var(--color-primario); 
+            background: white;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--sombra);
+            margin-bottom: 15px;
+        }
+        
+        .profile-menu {
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            max-width: 400px; 
+            margin: 0 auto;
+        }
+
+        /* Menú Hamburguesa (Overlay) */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: var(--blanco);
+            z-index: 200;
+            transform: translateX(-100%); /* Oculto a la izquierda */
+            transition: transform 0.3s ease;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        }
+        .menu-overlay.open {
+            transform: translateX(0); /* Mostrar */
+        }
+        .menu-item {
+            display: block;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--gris-claro);
+            font-size: 1.2rem;
+            color: var(--color-texto);
+            text-decoration: none;
+        }
+        .close-menu {
+            font-size: 2rem;
+            float: right;
+            cursor: pointer;
+        }
+
+        /* --- 5. RESPONSIVE (Escritorio) --- */
+        /* Cuando la pantalla es mayor a 768px (Tablets y PC) */
+        @media (min-width: 768px) {
+            .event-list {
+                display: grid; /* Cambiamos a Grid */
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Columnas automáticas */
+                gap: 30px;
+            }
+
+            .container {
+                padding: 40px;
+            }
+
+            .btn {
+                width: auto; 
+                padding: 15px 40px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        
-        <!-- Header Dinámico de la App (se oculta en Login) -->
-        <header class="app-header p-3 d-flex justify-content-between align-items-center d-none" id="appHeader">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-grid-3x3-gap-fill header-logo me-2"></i>
-                <span class="logo-text">WorkFlex</span>
-            </div>
-            <a href="#" class="text-decoration-none" id="profileLink">
-                <i class="bi bi-person-circle fs-4 text-muted"></i>
-                <span class="d-none d-sm-inline ms-1 text-muted">Mi perfil</span>
-            </a>
-        </header>
-
-        <!-- Contenedor principal de las vistas -->
-        <main class="flex-grow-1 p-4" id="appMainContent">
-            <!-- El contenido de la pantalla activa se inserta aquí con JavaScript -->
-        </main>
-
-        <!-- Footer (Solo para navegación de ejemplo, si fuera necesario) -->
-        <!-- <footer class="p-3 bg-light border-top text-center">Footer App</footer> -->
+    <!-- MENÚ LATERAL (Oculto por defecto) -->
+    <div id="sideMenu" class="menu-overlay">
+        <span class="close-menu" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</span>
+        <div style="margin-top: 40px;">
+            <a href="#" class="menu-item" onclick="goHome(); toggleMenu()"><i class="fas fa-home"></i> Inicio</a>
+            <a href="#" class="menu-item"><i class="fas fa-heart"></i> Favoritos</a>
+            <a href="#" class="menu-item"><i class="fas fa-ticket-alt"></i> Mis Entradas</a>
+            <a href="#" class="menu-item"><i class="fas fa-cog"></i> Configuración</a>
+            <a href="#" class="menu-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PANTALLA 1: LOGIN -->
+    <div id="view-login" class="view active container">
+        <div class="login-screen">
+            <div class="logo">
+                <i class="fas fa-theater-masks"></i><br>
+                <strong>Agenda Cultural</strong>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); goHome();">
+                <label for="email" class="sr-only">Correo electrónico</label>
+                <input type="email" id="email" placeholder="Correo electrónico" aria-label="Correo electrónico">
+                
+                <label for="password" class="sr-only">Contraseña</label>
+                <input type="password" id="password" placeholder="Contraseña" aria-label="Contraseña">
+                
+                <button type="submit" class="btn">Iniciar Sesión</button>
+            </form>
 
+            <p style="margin: 20px 0;">¿No tienes cuenta?</p>
+            <button class="btn btn-secundario">Registrarse</button>
+            <button class="btn btn-secundario" style="border:none; text-decoration: underline;" onclick="goHome()">Explorar sin registro</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: HOME / LISTADO -->
+    <div id="view-home" class="view">
+        <header>
+            <button class="icon-btn" onclick="toggleMenu()" aria-label="Abrir menú">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="header-title">
+                <label for="citySelect" class="sr-only">Seleccionar ciudad</label>
+                <i class="fas fa-map-marker-alt"></i>
+                <!-- El valor del select controlará qué eventos se ven -->
+                <select id="citySelect" class="city-selector" onchange="changeCity(this.value)">
+                    <option value="Barcelona" selected>Barcelona ▾</option>
+                    <option value="Madrid">Madrid ▾</option>
+                    <option value="Valencia">Valencia ▾</option>
+                </select>
+            </div>
+
+            <!-- BOTÓN DE PERFIL CONECTADO -->
+            <button class="icon-btn" aria-label="Mi perfil" onclick="goToProfile()">
+                <i class="fas fa-user-circle"></i>
+            </button>
+        </header>
+
+        <div class="container">
+            <div class="search-bar-container">
+                <i class="fas fa-search" style="color: #999; align-self: center;"></i>
+                <label for="searchInput" class="sr-only">Buscar eventos</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar conciertos, teatro..." onkeyup="searchEvents(this.value)">
+                
+                <button class="filter-btn-home" onclick="openFilters()" aria-label="Abrir filtros avanzados">
+                    <i class="fas fa-sliders-h"></i>
+                    Filtros
+                </button>
+            </div>
+
+            <h1 style="margin-bottom: 20px;" id="homeTitle">Eventos en Barcelona</h1>
+            
+            <div id="activeFiltersMsg" style="display:none; margin-bottom:10px; color: var(--color-primario);">
+                Filtros aplicados: <span id="filterText"></span> <button class="btn-text" onclick="clearFilters()">(Borrar)</button>
+            </div>
+
+            <div class="event-list" id="eventsContainer">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA FILTROS -->
+    <div id="view-filters" class="view">
+        <header>
+             <button class="icon-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <div class="header-title"><i class="fas fa-sliders-h"></i> Filtros</div>
+            <!-- BOTÓN DE PERFIL CONECTADO -->
+            <button class="icon-btn" onclick="goToProfile()"><i class="fas fa-user-circle"></i></button>
+        </header>
+
+        <div class="container">
+            <button class="btn-text" onclick="goHome()" style="margin-bottom: 20px;">&larr; Volver</button>
+            
+            <h2>Personaliza tu búsqueda</h2>
+            <p style="margin-bottom: 20px; color:#666;">Encuentra el plan perfecto.</p>
+
+            <form onsubmit="event.preventDefault(); applyFilters();">
+                <label for="filterCategory" style="display:block; font-weight:bold; margin-bottom:5px;">Categoría</label>
+                <!-- Categorías ampliadas -->
+                <select id="filterCategory">
+                    <option value="">Todas las categorías</option>
+                    <option value="Música">Música & Conciertos</option>
+                    <option value="Teatro">Teatro & Monólogos</option>
+                    <option value="Museos">Museos & Arte</option>
+                    <option value="Experiencias">Experiencias Inmersivas</option>
+                    <option value="Gastronomía">Gastronomía & Talleres</option>
+                </select>
+
+                <label for="filterDate" style="display:block; font-weight:bold; margin-bottom:5px;">Fecha</label>
+                <input type="date" id="filterDate" aria-label="Fecha del evento">
+
+                <div style="height: 20px;"></div>
+
+                <button type="submit" class="btn">Mostrar resultados</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- PANTALLA: PERFIL DE USUARIO (Wireframe 1 - arriba derecha) -->
+    <div id="view-profile" class="view">
+        <header>
+            <button class="icon-btn" onclick="goHome()" aria-label="Volver al inicio">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-title">Mi Perfil</div>
+            <div style="width: 44px;"></div> <!-- Spacer para centrar el título -->
+        </header>
+        
+        <div class="container" style="text-align: center;">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 style="margin-top: 10px;">Daniel Giménez</h2>
+                <p style="color: #666;">Miembro desde 2023</p>
+            </div>
+            
+            <div class="profile-menu">
+                <button class="btn btn-secundario" onclick="alert('Funcionalidad: Editar datos')">Modificar datos del perfil</button>
+                <button class="btn btn-secundario" onclick="alert('Funcionalidad: Ver historial de entradas')">Eventos Inscritos</button>
+                <button class="btn btn-secundario" onclick="alert('Funcionalidad: Ver Favoritos')">Guardados como favoritos</button>
+                <button class="btn btn-secundario" onclick="alert('Funcionalidad: Ver Historial')">Historial de eventos</button>
+                
+                <!-- Botón de Logout destacado -->
+                <button class="btn" onclick="logout()" style="background-color: #333; margin-top: 20px;">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: DETALLE DEL EVENTO -->
+    <div id="view-detail" class="view">
+        <header>
+            <button class="icon-btn" onclick="goHome()" aria-label="Volver atrás">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-title">Detalle</div>
+            <button class="icon-btn"><i class="fas fa-share-alt"></i></button>
+        </header>
+
+        <img src="" alt="Evento" class="detail-hero" id="detailImage">
+        
+        <div class="container detail-content">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <p class="event-date" id="detailDate">FECHA</p>
+                    <h1 style="font-size: 2rem; margin: 10px 0;" id="detailTitle">Título</h1>
+                    <span class="tag" id="detailCat">Categoría</span>
+                </div>
+                <button class="icon-btn" style="font-size: 2rem; color: var(--color-primario);" aria-label="Añadir a favoritos">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+
+            <div class="event-location" style="margin: 20px 0; font-size: 1.1rem;">
+                <i class="fas fa-map-marker-alt" style="color: var(--color-primario);"></i>
+                <span id="detailLocation">Ubicación</span>
+            </div>
+
+            <p style="margin-bottom: 30px; color: #555; line-height: 1.8;">
+                Descubre este increíble evento seleccionado para ti. Disfruta de una experiencia única, conoce gente nueva y vive la cultura de tu ciudad. 
+                <br><br>
+                <strong>Accesibilidad:</strong> Recinto adaptado para movilidad reducida. Bucle magnético disponible bajo petición.
+            </p>
+
+            <!-- CAMBIO AQUÍ: Botón de "Inscribirse al evento" -->
+            <button class="btn" onclick="goToConfirmation()">Inscribirse al evento</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 4: CONFIRMACIÓN -->
+    <div id="view-confirmation" class="view container">
+        <div class="success-message">
+            <div class="check-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>¡Todo listo!</h1>
+            <p style="font-size: 1.2rem; margin: 20px 0;">
+                Tu inscripción ha sido confirmada correctamente.
+            </p>
+            
+            <div style="background: white; padding: 20px; border-radius: 10px; margin: 20px 0; box-shadow: var(--sombra); text-align: left;">
+                <h3>Resumen:</h3>
+                <p><strong>Evento:</strong> <span id="confTitle"></span></p>
+                <p><strong>Fecha:</strong> <span id="confDate"></span></p>
+                <p><strong>Ubicación:</strong> <span id="confLoc"></span></p>
+            </div>
+
+            <button class="btn" onclick="goHome()">Volver a Agenda</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
     <script>
-        // --- Variables Globales ---
-        const mainContent = document.getElementById('appMainContent');
-        const appHeader = document.getElementById('appHeader');
-        const profileLink = document.getElementById('profileLink');
-        let isAuthenticated = false;
-        let currentPage = 'login'; // 'login', 'home', 'profile', 'reserve_type', 'reserve_details', 'confirmation'
+        // DATOS AMPLIADOS Y REALISTAS (Estilo Time Out / Fever)
+        // Incluyen la propiedad 'ciudad' para el filtrado
+        const eventosData = [
+            // BARCELONA
+            {
+                id: 1,
+                ciudad: "Barcelona",
+                titulo: "Candlelight: Tributo a Hans Zimmer",
+                fecha: "2023-10-15",
+                fechaDisplay: "15 OCT - 20:00",
+                ubicacion: "Basílica del Pi, Gótico",
+                imagen: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=500&q=60",
+                cat: "Música"
+            },
+            {
+                id: 2,
+                ciudad: "Barcelona",
+                titulo: "Van Gogh: The Immersive Experience",
+                fecha: "2023-10-16",
+                fechaDisplay: "16 OCT - 11:00",
+                ubicacion: "Cúpula Las Arenas, BCN",
+                imagen: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?auto=format&fit=crop&w=500&q=60",
+                cat: "Experiencias"
+            },
+            {
+                id: 3,
+                ciudad: "Barcelona",
+                titulo: "La Bromerie: Stand Up Comedy",
+                fecha: "2023-10-18",
+                fechaDisplay: "18 OCT - 21:30",
+                ubicacion: "Teatre Goya, BCN",
+                imagen: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=500&q=60",
+                cat: "Teatro"
+            },
+            {
+                id: 4,
+                ciudad: "Barcelona",
+                titulo: "Taller de Paella y Sangría",
+                fecha: "2023-10-20",
+                fechaDisplay: "20 OCT - 13:00",
+                ubicacion: "Mercado de la Boquería",
+                imagen: "https://images.unsplash.com/photo-1515443961218-a51367888e4b?auto=format&fit=crop&w=500&q=60",
+                cat: "Gastronomía"
+            },
+            {
+                id: 5,
+                ciudad: "Barcelona",
+                titulo: "Moco Museum: Arte Moderno",
+                fecha: "2023-10-21",
+                fechaDisplay: "21 OCT - 10:00",
+                ubicacion: "Carrer Montcada, Born",
+                imagen: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=500&q=60",
+                cat: "Museos"
+            },
+            {
+                id: 6,
+                ciudad: "Barcelona",
+                titulo: "Jazz & Soul Nights",
+                fecha: "2023-10-22",
+                fechaDisplay: "22 OCT - 22:00",
+                ubicacion: "Mas Ravetllat, Horta",
+                imagen: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=500&q=60",
+                cat: "Música"
+            },
+            // MADRID
+            {
+                id: 7,
+                ciudad: "Madrid",
+                titulo: "El Rey León: El Musical",
+                fecha: "2023-10-15",
+                fechaDisplay: "15 OCT - 19:00",
+                ubicacion: "Teatro Lope de Vega, Gran Vía",
+                imagen: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?auto=format&fit=crop&w=500&q=60",
+                cat: "Teatro"
+            },
+            {
+                id: 8,
+                ciudad: "Madrid",
+                titulo: "Museo del Prado: Visita Guiada",
+                fecha: "2023-10-16",
+                fechaDisplay: "16 OCT - 10:30",
+                ubicacion: "Paseo del Prado, Madrid",
+                imagen: "https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&w=500&q=60",
+                cat: "Museos"
+            },
+            {
+                id: 9,
+                ciudad: "Madrid",
+                titulo: "WAH Madrid: Show Gastronómico",
+                fecha: "2023-10-17",
+                fechaDisplay: "17 OCT - 20:00",
+                ubicacion: "IFEMA, Madrid",
+                imagen: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=500&q=60",
+                cat: "Experiencias"
+            },
+            {
+                id: 10,
+                ciudad: "Madrid",
+                titulo: "Cata de Vinos y Quesos",
+                fecha: "2023-10-19",
+                fechaDisplay: "19 OCT - 18:00",
+                ubicacion: "La Latina, Madrid",
+                imagen: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=500&q=60",
+                cat: "Gastronomía"
+            },
+            // VALENCIA
+            {
+                id: 11,
+                ciudad: "Valencia",
+                titulo: "Oceanogràfic: Nits al Mar",
+                fecha: "2023-10-20",
+                fechaDisplay: "20 OCT - 21:00",
+                ubicacion: "Ciutat de les Arts",
+                // Imagen corregida: Acuario/Medusas
+                imagen: "https://images.unsplash.com/photo-1582967788606-a171f1080ca8?auto=format&fit=crop&w=500&q=60",
+                cat: "Experiencias"
+            },
+            {
+                id: 12,
+                ciudad: "Valencia",
+                titulo: "Concierto: Banda Municipal",
+                fecha: "2023-10-22",
+                fechaDisplay: "22 OCT - 12:00",
+                ubicacion: "Palau de la Música, Valencia",
+                // Imagen corregida: Concierto clásico/Músicos
+                imagen: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=500&q=60",
+                cat: "Música"
+            }
+        ];
 
-        // --- Datos de Mockup ---
-        const MOCK_USER = { name: "Daniel Giménez", email: "daniel.gimenez@workflex.com" };
-        const MOCK_RESERVATION = {
-            date: "10/11/2025",
-            room: "Sala de Conferencias",
-            space: "Escritorio Fijo",
-            time: "09:00 - 18:00"
+        // Estado inicial
+        let currentFilters = {
+            category: "",
+            date: "",
+            search: "",
+            city: "Barcelona" // Ciudad por defecto
         };
-        const MOCK_CALENDAR = {
-            month: "November 2025",
-            days: [
-                { day: 'Dom', code: 0 }, { day: 'Lun', code: 1 }, { day: 'Mar', code: 2 }, { day: 'Mié', code: 3 }, 
-                { day: 'Jue', code: 4 }, { day: 'Vie', code: 5 }, { day: 'Sáb', code: 6 }
-            ],
-            dates: [
-                { num: 30, currentMonth: false }, { num: 1, currentMonth: true }, { num: 2, currentMonth: true }, { num: 3, currentMonth: true },
-                { num: 4, currentMonth: true }, { num: 5, currentMonth: true }, { num: 6, currentMonth: true, active: true }, { num: 7, currentMonth: true },
-                { num: 8, currentMonth: true }, { num: 9, currentMonth: true }, { num: 10, currentMonth: true, reserved: true }, { num: 11, currentMonth: true },
-                { num: 12, currentMonth: true }, { num: 13, currentMonth: true }, { num: 14, currentMonth: true }, { num: 15, currentMonth: true },
-                { num: 16, currentMonth: true }, { num: 17, currentMonth: true }, { num: 18, currentMonth: true }, { num: 19, currentMonth: true },
-                { num: 20, currentMonth: true }, { num: 21, currentMonth: true }, { num: 22, currentMonth: true }, { num: 23, currentMonth: true },
-                { num: 24, currentMonth: true }, { num: 25, currentMonth: true }, { num: 26, currentMonth: true }, { num: 27, currentMonth: true },
-                { num: 28, currentMonth: true }, { num: 29, currentMonth: true }, { num: 30, currentMonth: true }, { num: 1, currentMonth: false },
-                { num: 2, currentMonth: false }, { num: 3, currentMonth: false }, { num: 4, currentMonth: false }, { num: 5, currentMonth: false },
-                { num: 6, currentMonth: false }
-            ]
-        };
 
-        // --- Funciones de Renderizado de Pantallas ---
+        // --- FUNCIONES DE NAVEGACIÓN ---
 
-        function renderCalendar(activeDate = 6) {
-            const daysHtml = MOCK_CALENDAR.days.map(d => `<div class="fw-bold text-muted">${d.day}</div>`).join('');
-            const datesHtml = MOCK_CALENDAR.dates.map(date => {
-                let classes = 'calendar-day text-center';
-                if (!date.currentMonth) classes += ' disabled';
-                if (date.num === activeDate && date.currentMonth) classes += ' active';
-                if (date.reserved) classes += ' text-danger';
-                
-                return `<div class="${classes}">${date.num}</div>`;
-            }).join('');
-
-            return `
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <i class="bi bi-chevron-left text-muted"></i>
-                    <span class="fw-bold">${MOCK_CALENDAR.month}</span>
-                    <i class="bi bi-chevron-right text-muted"></i>
-                </div>
-                <div class="calendar-grid text-muted text-center">${daysHtml}</div>
-                <div class="calendar-grid text-dark text-center mt-1">${datesHtml}</div>
-            `;
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0, 0);
         }
 
-        // Pantalla 1: Login
-        function renderLogin() {
-            appHeader.classList.add('d-none');
-            // Estilo específico del mockup: logo en el centro
-            mainContent.classList.remove('p-4');
-            mainContent.innerHTML = `
-                <div class="text-center pt-5">
-                    <img src="http://googleusercontent.com/image_collection/image_retrieval/8306226160660114322_0" onerror="this.onerror=null;this.src='https://placehold.co/100x100/8D1A2C/FFFFFF?text=Logo';" alt="WorkFlex Logo" class="mb-4 rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
-                    <h1 class="logo-text mb-5">WorkFlex</h1>
-                </div>
-
-                <div class="card p-4 shadow-sm border-0">
-                    <p class="fw-bold mb-3">Iniciar sesión</p>
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <label for="inputUser" class="form-label visually-hidden">Usuario</label>
-                            <input type="email" class="form-control" id="inputUser" placeholder="Usuario" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="inputPassword" class="form-label visually-hidden">Contraseña</label>
-                            <input type="password" class="form-control" id="inputPassword" placeholder="Contraseña" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 mb-3">Continuar</button>
-                    </form>
-                </div>
-
-                <div class="text-center mt-4">
-                    <p class="mb-1 text-muted small">¿No dispones de una cuenta en WorkFlex?</p>
-                    <a href="#" class="btn btn-outline-secondary w-100" style="max-width: 200px;">Regístrate</a>
-                </div>
-            `;
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
-        }
-
-        // Pantalla 2: Home (Sesión iniciada)
-        function renderHome() {
-            appHeader.classList.remove('d-none');
-            mainContent.classList.add('p-4');
-            mainContent.innerHTML = `
-                <h2 class="mb-4">Sesión iniciada</h2>
-                <h1 class="fw-light mb-5">Hola de nuevo, ${MOCK_USER.name.split(' ')[0]}</h1>
-                
-                <div class="d-grid gap-3">
-                    <button class="btn btn-primary btn-lg py-3" onclick="navigate('reserve_type')">Nueva reserva</button>
-                    <button class="btn btn-outline-secondary btn-lg py-3">Modificar/Cancelar reserva</button>
-                </div>
-            `;
-        }
-
-        // Pantalla 3: Perfil
-        function renderProfile() {
-            appHeader.classList.remove('d-none');
-            mainContent.classList.add('p-4');
-            mainContent.innerHTML = `
-                <div class="text-center mb-5">
-                    <i class="bi bi-person-fill profile-icon rounded-circle p-2 border border-3" style="border-color: var(--bs-primary) !important;"></i>
-                    <h2 class="mt-3">${MOCK_USER.name}</h2>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Modificar perfil <i class="bi bi-chevron-right"></i></a>
-                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Estado de la membresía <i class="bi bi-chevron-right"></i></a>
-                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Historial de reservas <i class="bi bi-chevron-right"></i></a>
-                    <a href="#" class="btn btn-light text-start border d-flex justify-content-between align-items-center">Facturas <i class="bi bi-chevron-right"></i></a>
-                </div>
-
-                <div class="mt-5">
-                    <button class="btn btn-outline-danger w-100" onclick="handleLogout()">Cerrar sesión</button>
-                </div>
-            `;
-        }
-
-        // Pantalla 4: Nueva Reserva - Tipo y Fecha
-        function renderReserveType() {
-            appHeader.classList.remove('d-none');
-            // Ocultamos el link de Perfil en la cabecera para simular la navegación del mockup
-            profileLink.classList.add('d-none');
-            mainContent.classList.add('p-4');
-            
-            mainContent.innerHTML = `
-                <h2 class="mb-4">Nueva reserva</h2>
-                <p class="fw-bold">Selecciona una sede</p>
-                
-                <div class="mb-4">
-                    <select class="form-select">
-                        <option>Barcelona</option>
-                        <option>Madrid</option>
-                        <option>Valencia</option>
-                    </select>
-                </div>
-
-                <p class="fw-bold">Tipo de espacio</p>
-                <div class="mb-4">
-                    <select class="form-select">
-                        <option>Selecciona tipo de espacio...</option>
-                        <option>Escritorio</option>
-                        <option>Sala de reuniones</option>
-                        <option>Box telefónico</option>
-                    </select>
-                </div>
-
-                <p class="fw-bold">Disponibilidad</p>
-                <div class="card p-3 border-0 shadow-sm mb-4">
-                    ${renderCalendar(6)}
-                </div>
-
-                <button class="btn btn-primary w-100" onclick="navigate('reserve_details')">Confirmar reserva</button>
-                <button class="btn btn-link text-muted w-100 mt-2" onclick="navigate('home')">Cancelar</button>
-            `;
-        }
-
-        // Pantalla 5: Nueva Reserva - Detalles del Espacio
-        function renderReserveDetails() {
-            appHeader.classList.remove('d-none');
-            profileLink.classList.add('d-none');
-            mainContent.classList.add('p-4');
-            
-            mainContent.innerHTML = `
-                <h2 class="mb-4">Nueva reserva</h2>
-                
-                <div class="mb-4">
-                    <p class="fw-bold mb-2">Sede</p>
-                    <select class="form-select">
-                        <option selected>Barcelona</option>
-                    </select>
-                </div>
-
-                <p class="fw-bold mb-2">Tipo de espacio</p>
-                <p class="mb-3">Escritorio</p>
-                
-                <p class="fw-bold mb-2">Escritorio</p>
-                <div class="mb-4">
-                    <select class="form-select">
-                        <option>Selecciona escritorio...</option>
-                        <option>Escritorio Fijo #12</option>
-                        <option>Escritorio Flexible #4A</option>
-                    </select>
-                </div>
-
-                <p class="fw-bold">Disponibilidad</p>
-                <div class="card p-3 border-0 shadow-sm mb-4">
-                    ${renderCalendar(10)}
-                </div>
-
-                <button class="btn btn-primary w-100" onclick="navigate('confirmation')">Confirmar reserva</button>
-                <button class="btn btn-link text-muted w-100 mt-2" onclick="navigate('reserve_type')">Volver</button>
-            `;
+        function goHome() {
+            renderEvents(); 
+            switchView('view-home');
         }
         
-        // Pantalla 6: Confirmación
-        function renderConfirmation() {
-            appHeader.classList.remove('d-none');
-            profileLink.classList.remove('d-none');
-            mainContent.classList.add('p-4');
-            
-            mainContent.innerHTML = `
-                <div class="text-center pt-5 pb-4">
-                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
-                    <h1 class="mt-3 mb-5">¡Reserva confirmada!</h1>
-                </div>
-
-                <div class="card p-4 border-0 shadow-sm mb-5">
-                    <p class="fw-bold border-bottom pb-2">Detalles de la reserva:</p>
-                    
-                    <div class="d-flex justify-content-between py-2 border-bottom">
-                        <span class="text-muted"><i class="bi bi-calendar-event me-2"></i>Fecha</span>
-                        <span class="fw-bold">${MOCK_RESERVATION.date}</span>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between py-2 border-bottom">
-                        <span class="text-muted"><i class="bi bi-door-open me-2"></i>Espacio</span>
-                        <span class="fw-bold">${MOCK_RESERVATION.space}</span>
-                    </div>
-
-                    <div class="d-flex justify-content-between pt-2">
-                        <span class="text-muted"><i class="bi bi-clock me-2"></i>Hora</span>
-                        <span class="fw-bold">${MOCK_RESERVATION.time}</span>
-                    </div>
-                </div>
-
-                <p class="text-center text-muted small">Gracias por utilizar WorkFlex.</p>
-                <button class="btn btn-outline-secondary w-100 mt-3" onclick="navigate('home')">Volver al panel principal</button>
-            `;
-        }
-
-        // --- Lógica de Navegación y Auth ---
-
-        // Navegación entre pantallas
-        function navigate(page) {
-            currentPage = page;
-            profileLink.classList.remove('d-none'); // Mostrar por defecto
-            
-            switch (page) {
-                case 'login':
-                    renderLogin();
-                    break;
-                case 'home':
-                    if (isAuthenticated) renderHome();
-                    else renderLogin();
-                    break;
-                case 'profile':
-                    renderProfile();
-                    break;
-                case 'reserve_type':
-                    renderReserveType();
-                    break;
-                case 'reserve_details':
-                    renderReserveDetails();
-                    break;
-                case 'confirmation':
-                    renderConfirmation();
-                    break;
-                default:
-                    renderLogin();
-            }
-            window.scrollTo(0, 0); // Desplazar al inicio al cambiar de vista
-        }
-
-        // Manejadores de Eventos
-        function handleLogin(event) {
-            event.preventDefault();
-            // Simulación de autenticación exitosa
-            isAuthenticated = true;
-            navigate('home');
-        }
-
-        function handleLogout() {
-            isAuthenticated = false;
-            navigate('login');
+        function openFilters() {
+            switchView('view-filters');
         }
         
-        profileLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (isAuthenticated) {
-                navigate('profile');
+        // FUNCIÓN: Ir a perfil
+        function goToProfile() {
+            switchView('view-profile');
+        }
+
+        function logout() {
+            toggleMenu(); // Asegurar que menú está cerrado
+            switchView('view-login');
+        }
+
+        function goToConfirmation() {
+            document.getElementById('confTitle').innerText = document.getElementById('detailTitle').innerText;
+            document.getElementById('confDate').innerText = document.getElementById('detailDate').innerText;
+            document.getElementById('confLoc').innerText = document.getElementById('detailLocation').innerText;
+            // El mensaje de confirmación se ajusta a "inscripción"
+            document.querySelector('#view-confirmation .success-message p').innerText = "Tu inscripción ha sido confirmada correctamente.";
+            switchView('view-confirmation');
+        }
+
+        // --- LÓGICA DE INTERFAZ ---
+
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('open');
+        }
+
+        function changeCity(city) {
+            // Actualizamos el filtro de ciudad
+            currentFilters.city = city;
+            
+            // Actualizamos título del home
+            document.getElementById('homeTitle').innerText = `Eventos en ${city}`;
+
+            const container = document.getElementById('eventsContainer');
+            container.style.opacity = '0.5'; 
+            
+            setTimeout(() => {
+                renderEvents(); // Re-renderizar con nueva ciudad
+                container.style.opacity = '1';
+            }, 250);
+        }
+
+        function toggleFav(btn) {
+            event.stopPropagation();
+            btn.classList.toggle('active');
+            const icon = btn.querySelector('i');
+            btn.classList.contains('active') ? 
+                (icon.classList.remove('far'), icon.classList.add('fas')) : 
+                (icon.classList.remove('fas'), icon.classList.add('far'));
+        }
+
+        // --- LÓGICA DE FILTRADO Y RENDERIZADO ---
+        
+        function searchEvents(query) {
+            currentFilters.search = query.toLowerCase();
+            renderEvents();
+        }
+
+        function applyFilters() {
+            currentFilters.category = document.getElementById('filterCategory').value;
+            currentFilters.date = document.getElementById('filterDate').value;
+            
+            const filterMsg = document.getElementById('activeFiltersMsg');
+            const filterText = document.getElementById('filterText');
+            
+            if(currentFilters.category || currentFilters.date) {
+                filterMsg.style.display = 'block';
+                filterText.innerText = `${currentFilters.category} ${currentFilters.date}`;
+            } else {
+                filterMsg.style.display = 'none';
             }
-        });
+
+            goHome();
+        }
+        
+        function clearFilters() {
+            currentFilters.category = "";
+            currentFilters.date = "";
+            currentFilters.search = "";
+            // Nota: No reseteamos la ciudad
+            
+            document.getElementById('filterCategory').value = "";
+            document.getElementById('filterDate').value = "";
+            document.getElementById('searchInput').value = "";
+            document.getElementById('activeFiltersMsg').style.display = 'none';
+            renderEvents();
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('eventsContainer');
+            container.innerHTML = ''; 
+
+            // ALGORITMO DE FILTRADO
+            const filteredData = eventosData.filter(ev => {
+                // 1. Filtro Ciudad (Obligatorio)
+                if (ev.ciudad !== currentFilters.city) return false;
+
+                // 2. Búsqueda Texto
+                const matchSearch = ev.titulo.toLowerCase().includes(currentFilters.search) || 
+                                    ev.ubicacion.toLowerCase().includes(currentFilters.search);
+                
+                // 3. Categoría
+                const matchCat = currentFilters.category === "" || ev.cat === currentFilters.category;
+                
+                // 4. Fecha (Coincidencia exacta simple)
+                const matchDate = currentFilters.date === "" || ev.fecha === currentFilters.date;
+                
+                return matchSearch && matchCat && matchDate;
+            });
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 40px; color:#666;">
+                        <i class="fas fa-search" style="font-size: 3rem; color:#ddd; margin-bottom:15px;"></i>
+                        <p>No se encontraron eventos en <strong>${currentFilters.city}</strong> con esos criterios.</p>
+                        <button class="btn-text" onclick="clearFilters()">Ver todo en ${currentFilters.city}</button>
+                    </div>`;
+                return;
+            }
+
+            filteredData.forEach(ev => {
+                const html = `
+                    <div class="event-card" onclick="openDetail(${ev.id})" tabindex="0" role="button" aria-label="Ver detalles de ${ev.titulo}">
+                        <button class="fav-btn" onclick="toggleFav(this)" aria-label="Añadir a favoritos">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <img src="${ev.imagen}" alt="${ev.titulo}" class="event-img">
+                        <div class="event-content">
+                            <div class="event-date">${ev.fechaDisplay}</div>
+                            <h3 class="event-title">${ev.titulo}</h3>
+                            <div class="event-location">
+                                <i class="fas fa-map-marker-alt"></i> ${ev.ubicacion}
+                            </div>
+                            <div class="event-tags">
+                                <span class="tag">${ev.cat}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function openDetail(id) {
+            const evento = eventosData.find(e => e.id === id);
+            if(evento) {
+                document.getElementById('detailTitle').innerText = evento.titulo;
+                document.getElementById('detailDate').innerText = evento.fechaDisplay;
+                document.getElementById('detailLocation').innerText = evento.ubicacion;
+                document.getElementById('detailCat').innerText = evento.cat;
+                document.getElementById('detailImage').src = evento.imagen;
+                
+                switchView('view-detail');
+            }
+        }
 
         // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            navigate('login');
-        });
+        renderEvents();
+
     </script>
 </body>
 </html>

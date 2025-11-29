@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- Esto es CRUCIAL para móviles. Asegura que la web se adapte al ancho del dispositivo -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Cultural - Prototipo Accesible</title>
+    <title>Agenda Cultural - Prototipo Interactivo</title>
     
     <!-- Usamos FontAwesome para los iconos (corazón, menú, usuario) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -651,7 +651,7 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // DATOS AMPLIADOS Y REALISTAS (Estilo Time Out / Fever)
+        // DATOS AMPLIADOS Y REALISTAS
         // Incluyen la propiedad 'ciudad' para el filtrado
         const eventosData = [
             // BARCELONA
@@ -659,7 +659,7 @@
                 id: 1,
                 ciudad: "Barcelona",
                 titulo: "Candlelight: Tributo a Hans Zimmer",
-                fecha: "2023-10-15",
+                fecha: "2026-10-15",
                 fechaDisplay: "15 OCT - 20:00",
                 ubicacion: "Basílica del Pi, Gótico",
                 imagen: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=500&q=60",
@@ -669,7 +669,7 @@
                 id: 2,
                 ciudad: "Barcelona",
                 titulo: "Van Gogh: The Immersive Experience",
-                fecha: "2023-10-16",
+                fecha: "2026-10-16",
                 fechaDisplay: "16 OCT - 11:00",
                 ubicacion: "Cúpula Las Arenas, BCN",
                 imagen: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?auto=format&fit=crop&w=500&q=60",
@@ -679,7 +679,7 @@
                 id: 3,
                 ciudad: "Barcelona",
                 titulo: "La Bromerie: Stand Up Comedy",
-                fecha: "2023-10-18",
+                fecha: "2026-10-18",
                 fechaDisplay: "18 OCT - 21:30",
                 ubicacion: "Teatre Goya, BCN",
                 imagen: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=500&q=60",
@@ -689,7 +689,7 @@
                 id: 4,
                 ciudad: "Barcelona",
                 titulo: "Taller de Paella y Sangría",
-                fecha: "2023-10-20",
+                fecha: "2026-10-20",
                 fechaDisplay: "20 OCT - 13:00",
                 ubicacion: "Mercado de la Boquería",
                 imagen: "https://images.unsplash.com/photo-1515443961218-a51367888e4b?auto=format&fit=crop&w=500&q=60",
@@ -699,7 +699,7 @@
                 id: 5,
                 ciudad: "Barcelona",
                 titulo: "Moco Museum: Arte Moderno",
-                fecha: "2023-10-21",
+                fecha: "2026-10-21",
                 fechaDisplay: "21 OCT - 10:00",
                 ubicacion: "Carrer Montcada, Born",
                 imagen: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=500&q=60",
@@ -709,7 +709,7 @@
                 id: 6,
                 ciudad: "Barcelona",
                 titulo: "Jazz & Soul Nights",
-                fecha: "2023-10-22",
+                fecha: "2026-10-22",
                 fechaDisplay: "22 OCT - 22:00",
                 ubicacion: "Mas Ravetllat, Horta",
                 imagen: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=500&q=60",
@@ -720,7 +720,7 @@
                 id: 7,
                 ciudad: "Madrid",
                 titulo: "El Rey León: El Musical",
-                fecha: "2023-10-15",
+                fecha: "2026-10-15",
                 fechaDisplay: "15 OCT - 19:00",
                 ubicacion: "Teatro Lope de Vega, Gran Vía",
                 imagen: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?auto=format&fit=crop&w=500&q=60",
@@ -730,7 +730,7 @@
                 id: 8,
                 ciudad: "Madrid",
                 titulo: "Museo del Prado: Visita Guiada",
-                fecha: "2023-10-16",
+                fecha: "2026-10-16",
                 fechaDisplay: "16 OCT - 10:30",
                 ubicacion: "Paseo del Prado, Madrid",
                 imagen: "https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&w=500&q=60",
@@ -740,7 +740,7 @@
                 id: 9,
                 ciudad: "Madrid",
                 titulo: "WAH Madrid: Show Gastronómico",
-                fecha: "2023-10-17",
+                fecha: "2026-10-17",
                 fechaDisplay: "17 OCT - 20:00",
                 ubicacion: "IFEMA, Madrid",
                 imagen: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=500&q=60",
@@ -750,7 +750,7 @@
                 id: 10,
                 ciudad: "Madrid",
                 titulo: "Cata de Vinos y Quesos",
-                fecha: "2023-10-19",
+                fecha: "2026-10-19",
                 fechaDisplay: "19 OCT - 18:00",
                 ubicacion: "La Latina, Madrid",
                 imagen: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=500&q=60",
@@ -761,7 +761,7 @@
                 id: 11,
                 ciudad: "Valencia",
                 titulo: "Oceanogràfic: Nits al Mar",
-                fecha: "2023-10-20",
+                fecha: "2026-10-20",
                 fechaDisplay: "20 OCT - 21:00",
                 ubicacion: "Ciutat de les Arts",
                 // Imagen corregida: Acuario/Medusas
@@ -772,7 +772,7 @@
                 id: 12,
                 ciudad: "Valencia",
                 titulo: "Concierto: Banda Municipal",
-                fecha: "2023-10-22",
+                fecha: "2026-10-22",
                 fechaDisplay: "22 OCT - 12:00",
                 ubicacion: "Palau de la Música, Valencia",
                 // Imagen corregida: Concierto clásico/Músicos
